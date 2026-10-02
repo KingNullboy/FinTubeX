@@ -12,5 +12,10 @@ A Jellyfin plugin written in C# (.NET 9.0) designed for automated YouTube series
    ```bash
    dotnet build -c Release
 ```
-1. Copy bin/Release/net9.0/FinTubeX.dll into your Jellyfin plugins/FinTubeX/ directory.
+1. Copy `bin/Release/net9.0/FinTubeX.dll into your Jellyfin plugins/FinTubeX/` directory.
 2. Restart Jellyfin.
+
+## Future Features
+- Moonfin support
+   - A button in the navbar to open FinTubeX
+   - Depends solely on whether the Moonfin contributors will make an API for the navbar
