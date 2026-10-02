@@ -1,0 +1,12 @@
+/home/kingnullboy/Documents/Coding/C/FinTubeX/bin/Release/net8.0/FinTubeX.deps.json
+/home/kingnullboy/Documents/Coding/C/FinTubeX/bin/Release/net8.0/FinTubeX.dll
+/home/kingnullboy/Documents/Coding/C/FinTubeX/bin/Release/net8.0/FinTubeX.pdb
+/home/kingnullboy/Documents/Coding/C/FinTubeX/obj/Release/net8.0/FinTubeX.csproj.AssemblyReference.cache
+/home/kingnullboy/Documents/Coding/C/FinTubeX/obj/Release/net8.0/FinTubeX.GeneratedMSBuildEditorConfig.editorconfig
+/home/kingnullboy/Documents/Coding/C/FinTubeX/obj/Release/net8.0/FinTubeX.AssemblyInfoInputs.cache
+/home/kingnullboy/Documents/Coding/C/FinTubeX/obj/Release/net8.0/FinTubeX.AssemblyInfo.cs
+/home/kingnullboy/Documents/Coding/C/FinTubeX/obj/Release/net8.0/FinTubeX.csproj.CoreCompileInputs.cache
+/home/kingnullboy/Documents/Coding/C/FinTubeX/obj/Release/net8.0/FinTubeX.dll
+/home/kingnullboy/Documents/Coding/C/FinTubeX/obj/Release/net8.0/refint/FinTubeX.dll
+/home/kingnullboy/Documents/Coding/C/FinTubeX/obj/Release/net8.0/FinTubeX.pdb
+/home/kingnullboy/Documents/Coding/C/FinTubeX/obj/Release/net8.0/ref/FinTubeX.dll

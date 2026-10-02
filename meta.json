@@ -1,0 +1,14 @@
+{
+  "guid": "a8c90302-3b12-4c28-98e1-5bf3d33f3e1a",
+  "name": "FinTubeX",
+  "description": "A front end for yt-dlp: search YouTube or paste a link and download it into your library.",
+  "overview": "Search or paste a link, pick audio or video, download into Jellyfin.",
+  "owner": "kingnullboy",
+  "category": "General",
+  "version": "1.0.0.0",
+  "targetAbi": "10.11.0.0",
+  "timestamp": "2026-10-01T00:00:00Z",
+  "status": "Active",
+  "autoUpdate": false,
+  "assemblies": [ "FinTubeX.dll" ]
+}

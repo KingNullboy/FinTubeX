@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>YouTube</title>
+</head>
+<body>
+<div id="FinTubeXPage" data-role="page" class="page type-interior pluginConfigurationPage"
+     data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-collapse">
+    <style>
+        #FinTubeXPage .ftx-row { display: flex; gap: 1em; padding: .6em; margin: .4em 0; border-radius: 6px;
+            background: rgba(128,128,128,.12); align-items: center; }
+        #FinTubeXPage .ftx-thumb { width: 160px; height: 90px; object-fit: cover; border-radius: 4px; flex: none;
+            background: rgba(128,128,128,.25); }
+        #FinTubeXPage .ftx-meta { flex: 1; min-width: 0; }
+        #FinTubeXPage .ftx-title { font-weight: 600; overflow: hidden; text-overflow: ellipsis; }
+        #FinTubeXPage .ftx-sub { opacity: .7; font-size: .9em; }
+        #FinTubeXPage progress { width: 100%; height: .5em; }
+        #FinTubeXPage .ftx-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 0 1.5em; }
+        #FinTubeXPage .ftx-status { min-height: 1.5em; margin: .5em 0; }
+        #FinTubeXPage .ftx-bad { color: #e5484d; }
+        #FinTubeXPage pre { white-space: pre-wrap; opacity: .85; }
+        @media (max-width: 600px) { #FinTubeXPage .ftx-thumb { width: 110px; height: 62px; } }
+    </style>
+
+    <div data-role="content">
+        <div class="content-primary">
+
+            <div class="verticalSection">
+                <h2 class="sectionTitle">YouTube</h2>
+                <form id="ftxGo" autocomplete="off">
+                    <div class="inputContainer">
+                        <input is="emby-input" id="ftxQuery" type="text" label="Search, or paste a link" />
+                        <div class="fieldDescription">Text searches YouTube. A link downloads straight away.</div>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="emby-checkbox-label">
+                            <input is="emby-checkbox" type="checkbox" id="ftxAudio" />
+                            <span>Audio only</span>
+                        </label>
+                    </div>
+
+                    <div class="selectContainer">
+                        <label class="selectLabel" for="ftxQuality">Max video quality</label>
+                        <select is="emby-select" id="ftxQuality" class="emby-select-withcolor emby-select">
+                            <option value="360">360p</option>
+                            <option value="480">480p</option>
+                            <option value="720" selected>720p</option>
+                            <option value="1080">1080p</option>
+                            <option value="best">Best available</option>
+                        </select>
+                    </div>
+
+                    <div is="emby-collapse" title="Advanced options">
+                        <div class="collapseContent">
+                            <div class="ftx-grid">
+                                <div class="checkboxContainer"><label class="emby-checkbox-label"><input is="emby-checkbox" type="checkbox" id="ftxPlaylist" /><span>Download whole playlist</span></label></div>
+                                <div class="checkboxContainer"><label class="emby-checkbox-label"><input is="emby-checkbox" type="checkbox" id="ftxMeta" checked /><span>Embed metadata</span></label></div>
+                                <div class="checkboxContainer"><label class="emby-checkbox-label"><input is="emby-checkbox" type="checkbox" id="ftxThumb" /><span>Embed thumbnail</span></label></div>
+                                <div class="checkboxContainer"><label class="emby-checkbox-label"><input is="emby-checkbox" type="checkbox" id="ftxSubs" /><span>Embed subtitles</span></label></div>
+                                <div class="checkboxContainer"><label class="emby-checkbox-label"><input is="emby-checkbox" type="checkbox" id="ftxSponsor" /><span>Remove sponsor segments</span></label></div>
+                            </div>
+                            <div class="inputContainer"><input is="emby-input" id="ftxSubLangs" type="text" label="Subtitle languages" value="en.*" /></div>
+                            <div class="inputContainer"><input is="emby-input" id="ftxRate" type="text" label="Rate limit (e.g. 2M)" /></div>
+                            <div class="inputContainer"><input is="emby-input" id="ftxCookies" type="text" label="Cookies file path (inside the container)" /></div>
+                            <div class="inputContainer">
+                                <input is="emby-input" id="ftxTemplate" type="text" label="Output template" />
+                                <div class="fieldDescription">Relative to the download folder. Default: %(title)s [%(id)s].%(ext)s</div>
+                            </div>
+                            <div class="inputContainer">
+                                <input is="emby-input" id="ftxFlags" type="text" label="Extra yt-dlp flags" />
+                                <div class="fieldDescription">Passed through as-is, e.g. --write-info-json --limit-rate 1M</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <button is="emby-button" type="submit" class="raised button-submit block">
+                        <span>Go</span>
+                    </button>
+                </form>
+                <div id="ftxStatus" class="ftx-status"></div>
+            </div>
+
+            <div class="verticalSection" id="ftxResultsSection" hidden>
+                <h3 class="sectionTitle">Results</h3>
+                <div id="ftxResults"></div>
+            </div>
+
+            <div class="verticalSection">
+                <h3 class="sectionTitle">Downloads</h3>
+                <div id="ftxJobs"><div class="ftx-sub">Nothing yet.</div></div>
+            </div>
+
+            <div class="verticalSection">
+                <div is="emby-collapse" title="Settings">
+                    <div class="collapseContent">
+                        <form id="ftxSettings" autocomplete="off">
+                            <div class="inputContainer"><input is="emby-input" id="cfgDownloadPath" type="text" label="Download folder" /></div>
+                            <div class="inputContainer"><input is="emby-input" id="cfgYtDlp" type="text" label="yt-dlp path" /></div>
+                            <div class="inputContainer"><input is="emby-input" id="cfgDeno" type="text" label="Deno path (JS runtime for yt-dlp)" /></div>
+                            <div class="inputContainer"><input is="emby-input" id="cfgFfmpeg" type="text" label="ffmpeg path" /></div>
+                            <div class="inputContainer"><input is="emby-input" id="cfgRemote" type="text" label="Remote components" /></div>
+                            <div class="selectContainer">
+                                <label class="selectLabel" for="cfgQuality">Default quality</label>
+                                <select is="emby-select" id="cfgQuality" class="emby-select-withcolor emby-select">
+                                    <option value="360">360p</option>
+                                    <option value="480">480p</option>
+                                    <option value="720">720p</option>
+                                    <option value="1080">1080p</option>
+                                    <option value="best">Best available</option>
+                                </select>
+                            </div>
+                            <button is="emby-button" type="submit" class="raised button-submit block"><span>Save settings</span></button>
+                            <button is="emby-button" type="button" id="ftxDoctor" class="raised block"><span>Check setup</span></button>
+                        </form>
+                        <pre id="ftxDoctorOut"></pre>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script type="text/javascript">
+        (function () {
+            var PLUGIN_ID = 'a8c90302-3b12-4c28-98e1-5bf3d33f3e1a';
+            var page = document.querySelector('#FinTubeXPage');
+            var $ = function (s) { return page.querySelector(s); };
+            var timer = null;
+
+            // Jellyfin serialises PascalCase; accept camelCase too in case that ever changes.
+            function pick(o, k) {
+                if (!o) return undefined;
+                var v = o[k];
+                return v !== undefined ? v : o[k.charAt(0).toLowerCase() + k.slice(1)];
+            }
+
+            function call(method, path, body) {
+                return ApiClient.ajax({
+                    type: method,
+                    url: ApiClient.getUrl(path),
+                    data: body ? JSON.stringify(body) : undefined,
+                    contentType: 'application/json',
+                    dataType: 'json'
+                });
+            }
+
+            function status(msg, bad) {
+                var el = $('#ftxStatus');
+                el.textContent = msg || '';
+                el.className = 'ftx-status' + (bad ? ' ftx-bad' : '');
+            }
+
+            function fail(err) {
+                if (err && typeof err.text === 'function') {
+                    err.text().then(function (t) {
+                        status(t.replace(/^"|"$/g, '') || ('Request failed (' + err.status + ')'), true);
+                    });
+                } else {
+                    status(String(err), true);
+                }
+            }
+
+            function el(tag, cls, text) {
+                var e = document.createElement(tag);
+                if (cls) e.className = cls;
+                if (text !== undefined) e.textContent = text; // textContent only: titles come from the internet
+                return e;
+            }
+
+            function fmtDuration(s) {
+                if (!s) return '';
+                s = Math.round(s);
+                var h = Math.floor(s / 3600), m = Math.floor((s % 3600) / 60), x = s % 60;
+                var mm = (h ? String(m).padStart(2, '0') : String(m));
+                return (h ? h + ':' : '') + mm + ':' + String(x).padStart(2, '0');
+            }
+
+            function buildRequest(url) {
+                return {
+                    Url: url,
+                    AudioOnly: $('#ftxAudio').checked,
+                    Quality: $('#ftxQuality').value,
+                    Playlist: $('#ftxPlaylist').checked,
+                    EmbedMetadata: $('#ftxMeta').checked,
+                    EmbedThumbnail: $('#ftxThumb').checked,
+                    EmbedSubtitles: $('#ftxSubs').checked,
+                    SubtitleLangs: $('#ftxSubLangs').value,
+                    SponsorBlock: $('#ftxSponsor').checked,
+                    CookiesFile: $('#ftxCookies').value,
+                    RateLimit: $('#ftxRate').value,
+                    OutputTemplate: $('#ftxTemplate').value,
+                    CustomFlags: $('#ftxFlags').value
+                };
+            }
+
+            function startDownload(url, label) {
+                status('Queued: ' + label);
+                call('POST', 'FinTubeX/Download', buildRequest(url)).then(refreshJobs, fail);
+            }
+
+            function renderResults(list) {
+                var box = $('#ftxResults');
+                box.textContent = '';
+                $('#ftxResultsSection').hidden = false;
+                if (!list.length) {
+                    box.appendChild(el('div', 'ftx-sub', 'No results.'));
+                    return;
+                }
+                list.forEach(function (r) {
+                    var row = el('div', 'ftx-row');
+                    var img = el('img', 'ftx-thumb');
+                    img.loading = 'lazy';
+                    img.alt = '';
+                    img.src = pick(r, 'Thumbnail');
+                    var meta = el('div', 'ftx-meta');
+                    meta.appendChild(el('div', 'ftx-title', pick(r, 'Title')));
+                    var sub = [pick(r, 'Channel'), fmtDuration(pick(r, 'Duration'))].filter(Boolean).join(' - ');
+                    meta.appendChild(el('div', 'ftx-sub', sub));
+                    var btn = el('button', 'raised emby-button');
+                    btn.type = 'button';
+                    btn.appendChild(el('span', '', 'Download'));
+                    btn.addEventListener('click', function () {
+                        startDownload(pick(r, 'Url'), pick(r, 'Title'));
+                        btn.disabled = true;
+                    });
+                    row.appendChild(img);
+                    row.appendChild(meta);
+                    row.appendChild(btn);
+                    box.appendChild(row);
+                });
+            }
+
+            function renderJobs(list) {
+                var box = $('#ftxJobs');
+                box.textContent = '';
+                if (!list.length) {
+                    box.appendChild(el('div', 'ftx-sub', 'Nothing yet.'));
+                    return;
+                }
+                list.forEach(function (j) {
+                    var state = pick(j, 'State');
+                    var row = el('div', 'ftx-row');
+                    var meta = el('div', 'ftx-meta');
+                    meta.appendChild(el('div', 'ftx-title', pick(j, 'Title')));
+                    var detail = state === 'running' ? Math.round(pick(j, 'Percent')) + '%' : state;
+                    if (state === 'failed' && pick(j, 'Message')) detail += ': ' + pick(j, 'Message');
+                    meta.appendChild(el('div', state === 'failed' ? 'ftx-sub ftx-bad' : 'ftx-sub', detail));
+                    if (state === 'running' || state === 'queued') {
+                        var bar = document.createElement('progress');
+                        bar.max = 100;
+                        bar.value = pick(j, 'Percent') || 0;
+                        meta.appendChild(bar);
+                    }
+                    row.appendChild(meta);
+                    if (state === 'running' || state === 'queued') {
+                        var cancel = el('button', 'raised emby-button');
+                        cancel.type = 'button';
+                        cancel.appendChild(el('span', '', 'Cancel'));
+                        cancel.addEventListener('click', function () {
+                            call('POST', 'FinTubeX/Jobs/' + pick(j, 'Id') + '/Cancel').then(refreshJobs, refreshJobs);
+                        });
+                        row.appendChild(cancel);
+                    }
+                    box.appendChild(row);
+                });
+            }
+
+            function refreshJobs() {
+                return call('GET', 'FinTubeX/Jobs').then(renderJobs, function () { /* transient */ });
+            }
+
+            // Search box: link -> download now, anything else -> search.
+            $('#ftxGo').addEventListener('submit', function (e) {
+                e.preventDefault();
+                var q = $('#ftxQuery').value.trim();
+                if (!q) return;
+                if (/^https?:\/\//i.test(q)) {
+                    startDownload(q, q);
+                    $('#ftxQuery').value = '';
+                    return;
+                }
+                status('Searching...');
+                call('POST', 'FinTubeX/Search', { Query: q, Count: 10 }).then(function (list) {
+                    status('');
+                    renderResults(list);
+                }, fail);
+            });
+
+            // Settings
+            function loadSettings() {
+                ApiClient.getPluginConfiguration(PLUGIN_ID).then(function (c) {
+                    $('#cfgDownloadPath').value = c.DownloadPath || '';
+                    $('#cfgYtDlp').value = c.YtDlpPath || '';
+                    $('#cfgDeno').value = c.DenoPath || '';
+                    $('#cfgFfmpeg').value = c.FfmpegPath || '';
+                    $('#cfgRemote').value = c.RemoteComponents || '';
+                    $('#cfgQuality').value = c.DefaultQuality || '720';
+                    $('#ftxQuality').value = c.DefaultQuality || '720';
+                });
+            }
+
+            $('#ftxSettings').addEventListener('submit', function (e) {
+                e.preventDefault();
+                ApiClient.getPluginConfiguration(PLUGIN_ID).then(function (c) {
+                    c.DownloadPath = $('#cfgDownloadPath').value.trim();
+                    c.YtDlpPath = $('#cfgYtDlp').value.trim();
+                    c.DenoPath = $('#cfgDeno').value.trim();
+                    c.FfmpegPath = $('#cfgFfmpeg').value.trim();
+                    c.RemoteComponents = $('#cfgRemote').value.trim();
+                    c.DefaultQuality = $('#cfgQuality').value;
+                    ApiClient.updatePluginConfiguration(PLUGIN_ID, c).then(Dashboard.processPluginConfigurationUpdateResult);
+                });
+            });
+
+            $('#ftxDoctor').addEventListener('click', function () {
+                var out = $('#ftxDoctorOut');
+                out.textContent = 'Checking...';
+                call('GET', 'FinTubeX/Doctor').then(function (r) {
+                    out.textContent = Object.keys(r).map(function (k) { return k + ': ' + r[k]; }).join('\n');
+                }, function () { out.textContent = 'Check failed.'; });
+            });
+
+            page.addEventListener('pageshow', function () {
+                loadSettings();
+                refreshJobs();
+                clearInterval(timer);
+                timer = setInterval(refreshJobs, 2000);
+            });
+            page.addEventListener('pagehide', function () { clearInterval(timer); });
+        })();
+    </script>
+</div>
+</body>
+</html>

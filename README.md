@@ -1,0 +1,16 @@
+# FinTubeX
+
+A Jellyfin plugin written in C# (.NET 9.0) designed for automated YouTube series downloading and archiving using standalone `yt-dlp` and Deno.
+
+## Features
+- Integrates `yt-dlp` directly into Jellyfin.
+- Uses modern `--js-runtimes deno` flags for handling YouTube JS challenges.
+- Direct downloads for playlists and web series archive management.
+
+## Setup
+1. Compile the plugin using .NET 9 SDK:
+   ```bash
+   dotnet build -c Release
+```
+1. Copy bin/Release/net9.0/FinTubeX.dll into your Jellyfin plugins/FinTubeX/ directory.
+2. Restart Jellyfin.
